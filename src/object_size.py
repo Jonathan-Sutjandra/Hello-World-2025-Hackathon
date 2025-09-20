@@ -79,50 +79,50 @@ for c in cnts:
 	# (in this case, inches)
 	if pixelsPerMetric is None:
 		pixelsPerMetric = dB / args["width"]
-    # compute the size of the object
+	# compute the size of the object
 	dimA = dA / pixelsPerMetric
 	dimB = dB / pixelsPerMetric
-    dimsList.append([dimA, dimB])
-    # store the corner things in a list
-    corner_list.append([tltrX, tltrY, blbrX, blbrY, tlblX, tlblY, trbrX, trbrY])
+	dimsList.append([dimA, dimB])
+	# store the corner things in a list
+	corner_list.append([tltrX, tltrY, blbrX, blbrY, tlblX, tlblY, trbrX, trbrY])
 
-    counted_objects += 1
+	counted_objects += 1
 
 
 #find the smallest dimension pair, and assumes it to be the coin.
 coin_l = sys.maxsize
 coin_w = sys.maxsize
 for (diml, dimw) in dimsList:
-    if diml < coin_l and dimw < coin_w:
-        coin_l = diml
-        coin_w = dimw
+	if diml < coin_l and dimw < coin_w:
+		coin_l = diml
+		coin_w = dimw
 
 length_modifier = coin_l / dime_diameter
 width_modifier = coin_w / dime_diameter
 #corrected_dimList according to the dimensions/distortions of the coin
 corrected_dimList = []
 for (diml, dimw) in dimsList:
-    corrected_dimList.append([diml/length_modifier, dimw/width_modifier])
+	corrected_dimList.append([diml/length_modifier, dimw/width_modifier])
 
 counter = 0
 for (tltrX, tltrY, blbrX, blbrY, tlblX, tlblY, trbrX, trbrY) in corner_list:
-    # draw the midpoints on the image
-    cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
-    cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
-    cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
-    cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
-    # draw lines between the midpoints
-    cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
-             (255, 0, 255), 2)
-    cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
-             (255, 0, 255), 2)
-    # draw the object sizes on the image
-    cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][0]),
-                (int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
-                0.65, (0, 0, 0), 2)
-    cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][1]),
-                (int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
-                0.65, (0, 0, 0), 2)
-    # show the output image
-    cv2.imshow("Image", orig)
-    cv2.waitKey(0)
+	# draw the midpoints on the image
+	cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
+	# draw lines between the midpoints
+	cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
+			 (255, 0, 255), 2)
+	cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
+			 (255, 0, 255), 2)
+	# draw the object sizes on the image
+	cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][0]),
+				(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+				0.65, (0, 0, 0), 2)
+	cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][1]),
+				(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
+				0.65, (0, 0, 0), 2)
+	# show the output image
+	cv2.imshow("Image", orig)
+	cv2.waitKey(0)
