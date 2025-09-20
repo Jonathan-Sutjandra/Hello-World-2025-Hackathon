@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Dimension Detector</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@latest/dist/coco-ssd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📏 Object Dimension Detector</h1>
+            <p>Capture a photo and get object dimensions instantly!</p>
+        </header>
+
+        <div class="camera-section">
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div class="camera-overlay">
+                    <div class="crosshair"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="startCamera" class="btn btn-primary">
+                    📷 Start Camera
+                </button>
+                <button id="capturePhoto" class="btn btn-capture" disabled>
+                    📸 Capture & Analyze
+                </button>
+                <button id="uploadPhoto" class="btn btn-secondary">
+                    📁 Upload Photo
+                </button>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>Detection Results</h2>
+            <div class="image-container">
+                <img id="capturedImage" alt="Captured image">
+                <canvas id="detectionCanvas"></canvas>
+            </div>
+            <div class="objects-list" id="objectsList">
+                <!-- Detected objects will be displayed here -->
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Measurement Settings</h3>
+            <div class="setting-group">
+                <label for="referenceObject">Reference Object (for scale):</label>
+                <select id="referenceObject">
+                    <option value="coin">Coin (24mm)</option>
+                    <option value="credit-card">Credit Card (85.6mm x 53.98mm)</option>
+                    <option value="phone">Phone (varies)</option>
+                    <option value="custom">Custom Size</option>
+                </select>
+            </div>
+            <div class="setting-group" id="customSizeGroup" style="display: none;">
+                <label for="customWidth">Custom Width (mm):</label>
+                <input type="number" id="customWidth" placeholder="Enter width in mm">
+                <label for="customHeight">Custom Height (mm):</label>
+                <input type="number" id="customHeight" placeholder="Enter height in mm">
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
