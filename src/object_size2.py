@@ -19,13 +19,13 @@ ap.add_argument("-w", "--width", type=float, required=True,
 args = vars(ap.parse_args())
 # load the image, convert it to grayscale, and blur it slightly
 background_remove.remove_bg_with_mask(args["image"], "assets/returned_image.jpg", "assets/returned_mask.png")
-image = cv2.imread("assets/returned_mask.png")
-# gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-# gray = cv2.GaussianBlur(gray, (7, 7), 0)
+image = cv2.imread("assets/returned_mask.png", cv2.IMREAD_GRAYSCALE)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+gray = cv2.GaussianBlur(gray, (7, 7), 0)
 # perform edge detection, then perform a dilation + erosion to
 # close gaps in between object edges
-edged = cv2.Canny(image, 50, 100)
-edged = cv2.dilate(edged, None, iterations=1)
+edged = cv2.Canny(gray, 50, 100)
+edged = cv2.dilate(edged, None, iterations=2)
 edged = cv2.erode(edged, None, iterations=1)
 # find contours in the edge map
 cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
