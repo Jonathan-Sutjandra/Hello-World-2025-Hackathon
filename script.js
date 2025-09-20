@@ -6,10 +6,11 @@ class ObjectDimensionDetector {
         this.capturedImage = document.getElementById('capturedImage');
         this.model = null;
         this.stream = null;
+        this.predictions = [];
         this.referenceObjects = {
             'coin': { width: 24, height: 24 },
             'credit-card': { width: 85.6, height: 53.98 },
-            'phone': { width: 70, height: 140 }, // Average phone size
+            'phone': { width: 70, height: 140 },
             'custom': { width: 0, height: 0 }
         };
         
@@ -29,13 +30,10 @@ class ObjectDimensionDetector {
     }
 
     initializeEventListeners() {
-        // Camera controls
         document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
         document.getElementById('capturePhoto').addEventListener('click', () => this.captureAndAnalyze());
         document.getElementById('uploadPhoto').addEventListener('click', () => this.uploadPhoto());
         document.getElementById('fileInput').addEventListener('change', (e) => this.handleFileUpload(e));
-
-        // Settings
         document.getElementById('referenceObject').addEventListener('change', (e) => this.handleReferenceChange(e));
         document.getElementById('customWidth').addEventListener('input', () => this.updateCustomReference());
         document.getElementById('customHeight').addEventListener('input', () => this.updateCustomReference());
@@ -45,7 +43,7 @@ class ObjectDimensionDetector {
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: 'environment', // Use back camera on mobile
+                    facingMode: 'environment',
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 }
@@ -70,13 +68,11 @@ class ObjectDimensionDetector {
             return;
         }
 
-        // Capture frame from video
         const context = this.canvas.getContext('2d');
         this.canvas.width = this.video.videoWidth;
         this.canvas.height = this.video.videoHeight;
         context.drawImage(this.video, 0, 0);
 
-        // Convert canvas to image
         const imageData = this.canvas.toDataURL('image/jpeg');
         this.analyzeImage(imageData);
     }
@@ -106,15 +102,11 @@ class ObjectDimensionDetector {
         this.capturedImage.src = imageData;
 
         try {
-            // Create image element for detection
             const img = new Image();
             img.onload = async () => {
                 try {
-                    // Run object detection
                     const predictions = await this.model.detect(img);
                     console.log('Detections:', predictions);
-
-                    // Calculate dimensions and display results
                     this.displayResults(img, predictions);
                 } catch (error) {
                     console.error('Error during detection:', error);
@@ -134,57 +126,82 @@ class ObjectDimensionDetector {
     displayResults(image, predictions) {
         const resultsSection = document.getElementById('resultsSection');
         const objectsList = document.getElementById('objectsList');
-        
-        // Clear previous results
         objectsList.innerHTML = '';
-        
-        // Set up detection canvas
+
         this.detectionCanvas.width = image.width;
         this.detectionCanvas.height = image.height;
         const ctx = this.detectionCanvas.getContext('2d');
-        
-        // Draw bounding boxes and calculate dimensions
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        this.predictions = predictions;
+
         predictions.forEach((prediction, index) => {
             this.drawBoundingBox(ctx, prediction);
             this.createObjectCard(prediction, image, index);
         });
-        
+
+        this.detectionCanvas.style.pointerEvents = "auto";
+        this.detectionCanvas.addEventListener("click", (e) => this.handleCanvasClick(e, image));
+
         resultsSection.style.display = 'block';
         resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 
-    drawBoundingBox(ctx, prediction) {
+    handleCanvasClick(event, image) {
+        const rect = this.detectionCanvas.getBoundingClientRect();
+        const x = (event.clientX - rect.left) * (this.detectionCanvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (this.detectionCanvas.height / rect.height);
+
+        this.predictions.forEach((pred, idx) => {
+            const [bx, by, bw, bh] = pred.bbox;
+            if (x >= bx && x <= bx + bw && y >= by && y <= by + bh) {
+                this.highlightObject(pred, idx);
+            }
+        });
+    }
+
+    highlightObject(prediction, index) {
+        const ctx = this.detectionCanvas.getContext('2d');
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        this.predictions.forEach((p, i) => {
+            if (i === index) {
+                this.drawBoundingBox(ctx, p, true);
+            } else {
+                this.drawBoundingBox(ctx, p);
+            }
+        });
+
+        const objectsList = document.getElementById('objectsList');
+        const card = objectsList.children[index];
+        if (card) {
+            card.classList.add("highlight");
+            card.scrollIntoView({ behavior: "smooth", block: "center" });
+            setTimeout(() => card.classList.remove("highlight"), 1500);
+        }
+    }
+
+    drawBoundingBox(ctx, prediction, highlight = false) {
         const [x, y, width, height] = prediction.bbox;
-        
-        // Draw bounding box
-        ctx.strokeStyle = '#4CAF50';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = highlight ? '#FF0000' : '#4CAF50';
+        ctx.lineWidth = highlight ? 4 : 3;
         ctx.strokeRect(x, y, width, height);
-        
-        // Draw label background
-        ctx.fillStyle = '#4CAF50';
-        ctx.fillRect(x, y - 30, ctx.measureText(prediction.class).width + 20, 30);
-        
-        // Draw label text
-        ctx.fillStyle = 'white';
+
+        ctx.fillStyle = highlight ? '#FF0000' : '#4CAF50';
         ctx.font = '16px Arial';
-        ctx.fillText(prediction.class, x + 10, y - 10);
+        ctx.fillText(prediction.class, x + 5, y - 5);
     }
 
     createObjectCard(prediction, image, index) {
         const objectsList = document.getElementById('objectsList');
         const [x, y, width, height] = prediction.bbox;
         
-        // Calculate dimensions in pixels
         const pixelWidth = width;
         const pixelHeight = height;
         
-        // Get reference object for scale
         const referenceType = document.getElementById('referenceObject').value;
         const reference = this.referenceObjects[referenceType];
         
-        // Calculate real-world dimensions
-        // This is a simplified calculation - in a real app, you'd need more sophisticated calibration
         const scaleFactor = this.estimateScaleFactor(image, reference);
         const realWidth = pixelWidth * scaleFactor;
         const realHeight = pixelHeight * scaleFactor;
@@ -217,18 +234,10 @@ class ObjectDimensionDetector {
     }
 
     estimateScaleFactor(image, reference) {
-        // This is a simplified scale estimation
-        // In a real application, you'd need proper camera calibration
-        // and reference object detection
-        
         const imageWidth = image.width;
         const imageHeight = image.height;
-        
-        // Assume reference object takes up about 5-10% of image width
-        // This is a rough estimation - actual implementation would be more sophisticated
         const estimatedReferencePixels = Math.min(imageWidth, imageHeight) * 0.08;
         const scaleFactor = reference.width / estimatedReferencePixels;
-        
         return scaleFactor;
     }
 
@@ -251,7 +260,6 @@ class ObjectDimensionDetector {
         document.getElementById('loading').style.display = show ? 'block' : 'none';
     }
 
-    // Clean up camera stream when page is unloaded
     cleanup() {
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
@@ -259,21 +267,9 @@ class ObjectDimensionDetector {
     }
 }
 
-// Initialize the app when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     const detector = new ObjectDimensionDetector();
-    
-    // Clean up on page unload
     window.addEventListener('beforeunload', () => {
         detector.cleanup();
     });
-});
-
-// Handle page visibility changes
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // Page is hidden, could pause camera here
-    } else {
-        // Page is visible again
-    }
 });
