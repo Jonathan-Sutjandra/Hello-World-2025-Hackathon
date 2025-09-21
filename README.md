@@ -135,6 +135,9 @@ Upload first: If camera permissions fail, upload an image instead.
 
 Temporary files: Images are saved temporarily in the assets/ folder. It’s cleaned automatically per session.
 
+## Credit
+Used some code from this website: https://pyimagesearch.com/2016/03/28/measuring-size-of-objects-in-an-image-with-opencv/
+
 ## License 📜
 
 This project is licensed under the MIT License.
