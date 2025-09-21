@@ -114,17 +114,32 @@ function dataURLtoFile(dataurl, filename) {
 
 // Render backend results: annotated image + object stats
 function displayResults(result) {
-  if (!result || !result.objects) {
+  if (!result || !result.objects || result.objects.length === 0) {
     alert('No objects detected.');
     return;
   }
 
   // Show processed image
-  capturedImage.src = result.processed_image;
+  //capturedImage.src = result.processed_image;
 
-  // Populate measurements list
   const list = document.getElementById('objectsList');
   list.innerHTML = '';
+
+  // ✅ Display frame info once (from first object)
+  const frame = result.objects[0];
+  if (frame.frame_width && frame.frame_height && frame.frame_dimes) {
+    const frameInfo = document.createElement('div');
+    frameInfo.className = 'frame-info';
+    frameInfo.innerHTML = `
+      <h2>Frame</h2>
+      <div>Width: ${frame.frame_width.toFixed(2)} in</div>
+      <div>Height: ${frame.frame_height.toFixed(2)} in</div>
+      <div>≈ ${frame.frame_dimes.toFixed(0)} dimes fit inside</div>
+    `;
+    list.appendChild(frameInfo);
+  }
+
+  // ✅ Display each detected object
   result.objects.forEach((obj, i) => {
     const item = document.createElement('div');
     item.className = 'object-item';
@@ -133,11 +148,12 @@ function displayResults(result) {
       <div>Width: ${obj.width.toFixed(2)} in</div>
       <div>Height: ${obj.height.toFixed(2)} in</div>
       <div>Area: ${obj.area.toFixed(2)} in²</div>
+      <div>≈ ${obj.number_of_coins.toFixed(0)} dimes fit inside</div>
     `;
     list.appendChild(item);
   });
 
-  // Draw contours on the detectionCanvas
+  // ✅ Draw contours on detectionCanvas
   const ctx = detectionCanvas.getContext('2d');
   const img = new Image();
   img.onload = () => {
