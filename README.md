@@ -1,4 +1,4 @@
-#Welcome to DimEnvision
+# Welcome to DimEnvision
 
 A web app that lets users measure physical objects using images from a camera or uploaded photos. The app automatically removes the background, detects objects, and calculates dimensions in inches, along with the number of coins (dimes) that could fit inside each object.
 
