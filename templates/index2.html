@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Object Measurement</title>
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='styles.css') }}"
+  />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Object Measurement</h1>
+      <p>Measure objects quickly using your phone’s camera or upload an image.</p>
+    </header>
+
+    <section class="camera-section">
+      <!-- Video wrapper: provides a fixed size for your video element -->
+      <div class="camera-container">
+        <video
+          id="video"
+          autoplay
+          muted
+          playsinline
+        ></video>
+
+        <!-- Optional crosshair overlay -->
+        <div class="camera-overlay">
+          <div class="crosshair"></div>
+        </div>
+      </div>
+
+      <!-- Hidden offscreen canvas for snapshot capture -->
+      <canvas id="canvas" hidden></canvas>
+
+      <div class="controls">
+        <button id="startCamera" class="btn btn-primary">Start Camera</button>
+        <button id="capturePhoto" class="btn btn-capture" disabled>Capture Photo</button>
+        <button id="uploadPhoto" class="btn btn-secondary">Upload Photo</button>
+        <input
+          id="fileInput"
+          type="file"
+          accept="image/*"
+          class="visually-hidden"
+        />
+      </div>
+    </section>
+
+    <section class="results-section">
+      <h2>Results</h2>
+      <p class="selection-info">
+        Select an object in the image to view its dimensions.
+      </p>
+      <div class="image-container">
+        <img id="capturedImage" alt="Processed image" />
+        <canvas id="detectionCanvas"></canvas>
+      </div>
+      <div class="objects-list" id="objectsList"></div>
+    </section>
+
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Processing image…</p>
+    </div>
+  </div>
+
+  <script defer src="{{ url_for('static', filename='app2.js') }}"></script>
+</body>
+</html>
