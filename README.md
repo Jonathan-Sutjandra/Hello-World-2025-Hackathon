@@ -56,6 +56,8 @@ NOT THIS -> 🚀 Public URL: https://<random-subdomain>.trycloudflare.com
 
 INSTEAD, SHOULD LOOK SOMETHING LIKE THIS -> 2025-09-21T14:49:34Z INF |  https://jennifer-debug-order-verified.trycloudflare.com
 
+The first four words before the "trycloudflare.com" are randomly generated and will change every time you run python app3.py
+
 
 Use your phone or computer to visit the URL and capture/upload an image.
 
