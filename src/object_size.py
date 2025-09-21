@@ -32,6 +32,15 @@ cnts = imutils.grab_contours(cnts)
 # 'pixels per metric' calibration variable
 (cnts, _) = contours.sort_contours(cnts)
 pixelsPerMetric = None
+
+# item dimension list that stores all item dimensions in a 2d list
+dimsList = []
+# real coin diameter. this is assuming a dime is being used.
+dime_diameter = 0.705
+#number of counted objects
+counted_objects = 0
+corner_list = []
+
 # loop over the contours individually
 for c in cnts:
 	# if the contour is not sufficiently large, ignore it
@@ -61,16 +70,7 @@ for c in cnts:
 	# followed by the midpoint between the top-right and bottom-right
 	(tlblX, tlblY) = midpoint(tl, bl)
 	(trbrX, trbrY) = midpoint(tr, br)
-	# draw the midpoints on the image
-	cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
-	# draw lines between the midpoints
-	cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
-		(255, 0, 255), 2)
-	cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
-		(255, 0, 255), 2)
+
 # compute the Euclidean distance between the midpoints
 	dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
 	dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
@@ -79,16 +79,50 @@ for c in cnts:
 	# (in this case, inches)
 	if pixelsPerMetric is None:
 		pixelsPerMetric = dB / args["width"]
-    # compute the size of the object
+	# compute the size of the object
 	dimA = dA / pixelsPerMetric
 	dimB = dB / pixelsPerMetric
+	dimsList.append([dimA, dimB])
+	# store the corner things in a list
+	corner_list.append([tltrX, tltrY, blbrX, blbrY, tlblX, tlblY, trbrX, trbrY])
+
+	counted_objects += 1
+
+
+#find the smallest dimension pair, and assumes it to be the coin.
+coin_l = sys.maxsize
+coin_w = sys.maxsize
+for (diml, dimw) in dimsList:
+	if diml < coin_l and dimw < coin_w:
+		coin_l = diml
+		coin_w = dimw
+
+length_modifier = coin_l / dime_diameter
+width_modifier = coin_w / dime_diameter
+#corrected_dimList according to the dimensions/distortions of the coin
+corrected_dimList = []
+for (diml, dimw) in dimsList:
+	corrected_dimList.append([diml/length_modifier, dimw/width_modifier])
+
+counter = 0
+for (tltrX, tltrY, blbrX, blbrY, tlblX, tlblY, trbrX, trbrY) in corner_list:
+	# draw the midpoints on the image
+	cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
+	cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
+	# draw lines between the midpoints
+	cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
+			 (255, 0, 255), 2)
+	cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
+			 (255, 0, 255), 2)
 	# draw the object sizes on the image
-	cv2.putText(orig, "{:.1f}in".format(dimA),
-		(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
-		0.65, (0, 0, 0), 2)
-	cv2.putText(orig, "{:.1f}in".format(dimB),
-		(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
-		0.65, (0, 0, 0), 2)
+	cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][0]),
+				(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+				0.65, (0, 0, 0), 2)
+	cv2.putText(orig, "{:.1f}in".format(corrected_dimList[counter][1]),
+				(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
+				0.65, (0, 0, 0), 2)
 	# show the output image
 	cv2.imshow("Image", orig)
 	cv2.waitKey(0)
