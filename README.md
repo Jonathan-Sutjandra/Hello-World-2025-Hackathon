@@ -4,7 +4,7 @@ A web app that lets users measure physical objects using images from a camera or
 
 Built with Python, Flask, OpenCV, JavaScript, and Cloudflare Tunnel for easy online access.
 
-Features ✨
+## Features ✨
 
 Capture objects using your phone camera or upload an image.
 
@@ -18,11 +18,7 @@ Annotated images with measurement overlays.
 
 Interactive canvas to visualize object contours.
 
-Demo
-
-(replace with your own image if available)
-
-Installation 💻
+## Installation 💻
 
 Clone the repository:
 
@@ -30,7 +26,7 @@ git clone https://github.com/yourusername/object-measurement-webapp.git
 cd object-measurement-webapp
 
 
-Create a virtual environment (recommended):
+Create a virtual environment (not required but recommended):
 
 python -m venv venv
 source venv/bin/activate  # Linux / macOS
@@ -47,16 +43,17 @@ Install Cloudflare Tunnel (cloudflared):
 Follow instructions from Cloudflare Tunnel
 .
 
-Running the App 🚀
+## Running the App 🚀
 
 Start the Flask app with Cloudflare tunnel:
 
 python app3.py
 
 
-Access the public URL printed in the terminal:
+Access the URL printed in the terminal:
 
-🚀 Public URL: https://<random-subdomain>.trycloudflare.com
+NOT THIS -> 🚀 Public URL: https://<random-subdomain>.trycloudflare.com
+INSTEAD, SHOULD LOOK SOMETHING LIKE THIS -> 2025-09-21T14:49:34Z INF |  https://jennifer-debug-order-verified.trycloudflare.com
 
 
 Use your phone or computer to visit the URL and capture/upload an image.
@@ -76,7 +73,7 @@ File Structure 🗂️
 │   └─ screenshot.png
 └─ requirements.txt         # Python dependencies
 
-How it Works ⚙️
+## How it Works ⚙️
 
 Frontend:
 
@@ -110,7 +107,7 @@ Shows annotated image and object measurements.
 
 Draws contours on a canvas overlay.
 
-Dependencies 📦
+## Dependencies 📦
 
 Python 3.10+
 
@@ -130,7 +127,7 @@ Cloudflared (for public tunneling)
 
 pip install flask opencv-python numpy scipy imutils backgroundremover
 
-Tips for Hackathon Judges 🎯
+## Tips for Hackathon Judges 🎯
 
 No browser auto-opening: The app prints the public URL to the console. Open it manually.
 
@@ -146,6 +143,6 @@ Submit pull requests for bug fixes or features.
 
 Open issues for questions or improvements.
 
-License 📜
+## License 📜
 
 This project is licensed under the MIT License.
