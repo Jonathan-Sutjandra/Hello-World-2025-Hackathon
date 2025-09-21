@@ -63,17 +63,29 @@ Use your phone or computer to visit the URL and capture/upload an image.
 
 File Structure 🗂️
 ├─ app3.py                  # Main Flask app + Cloudflare integration
+
 ├─ object_size_module.py    # Image processing & measurement logic
+
 ├─ templates/
+
 │   └─ index2.html          # Frontend HTML
+
 ├─ static/
+
 │   ├─ app2.js              # Frontend JavaScript
+
 │   └─ styles.css           # Frontend CSS
+
 ├─ assets/                  # Temporary image storage + screenshots
+
 │   ├─ input_tmp.png
+
 │   ├─ bg_tmp.png
+
 │   ├─ mask_tmp.png
+
 │   └─ screenshot.png
+
 └─ requirements.txt         # Python dependencies
 
 ## How it Works ⚙️
