@@ -45,6 +45,7 @@ def process_image(image_bgr, ref_width_in=0.705):
     Process an image, remove background, find objects, and measure them.
     Returns annotated image and list of object measurements.
     """
+    coin_area = ref_width_in ** 2
     # 1. Save input temporarily
     input_path    = "assets/input_tmp.png"
     bg_out_path   = "assets/bg_tmp.png"
@@ -103,7 +104,11 @@ def process_image(image_bgr, ref_width_in=0.705):
     coin_w, coin_l = coin_obj["dims"]
     width_modifier  = coin_w / ref_width_in
     length_modifier = coin_l / ref_width_in
-
+    frame_h, frame_w = image_bgr.shape[:2]
+    frame_w_in = frame_w / width_modifier
+    frame_h_in = frame_h / length_modifier
+    frame_area = frame_w_in * frame_h_in
+    frame_dimes = frame_area / coin_area
     # Annotate image
     annotated = image_bgr.copy()
     results = []
@@ -130,6 +135,11 @@ def process_image(image_bgr, ref_width_in=0.705):
             "width": real_w,
             "height": real_h,
             "area": real_w * real_h,
-            "box": [pt.tolist() for pt in obj["box"]]
+            "box": [pt.tolist() for pt in obj["box"]],
+            "number_of_coins": real_w * real_h/coin_area,
+            "frame_width": frame_w_in,
+            "frame_height": frame_h_in,
+            "frame_dimes": frame_dimes
         })
+
     return annotated, results
