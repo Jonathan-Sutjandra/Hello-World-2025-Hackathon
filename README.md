@@ -53,6 +53,7 @@ python app3.py
 Access the URL printed in the terminal:
 
 NOT THIS -> 🚀 Public URL: https://<random-subdomain>.trycloudflare.com
+
 INSTEAD, SHOULD LOOK SOMETHING LIKE THIS -> 2025-09-21T14:49:34Z INF |  https://jennifer-debug-order-verified.trycloudflare.com
 
 
