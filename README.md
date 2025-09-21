@@ -135,14 +135,6 @@ Upload first: If camera permissions fail, upload an image instead.
 
 Temporary files: Images are saved temporarily in the assets/ folder. It’s cleaned automatically per session.
 
-Contributing 🤝
-
-Contributions are welcome!
-
-Submit pull requests for bug fixes or features.
-
-Open issues for questions or improvements.
-
 ## License 📜
 
 This project is licensed under the MIT License.
